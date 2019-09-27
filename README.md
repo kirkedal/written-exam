@@ -1,5 +1,7 @@
 # Written Exam LaTeX Package
 
+@ Michael Kirkedal Thomsen, 2019.
+
 This document describes the written-exam.sty latex package that is intended to be an easy way of setting up short written exams with space for inline answers.
 
 The package now have initial support for answers. If answers are to be shown, use include with `\usepackage[solutions]{written-exam}`. If `solutions` property is omitted, solutions will not be shown.
@@ -139,7 +141,3 @@ There text will only be shown if text is set.
 I will make it possible to have solutions for figures soon. But I might have to change it to an environment (edited)
 
 I also made a `\ifsolutionelse{solution text}{text}` that can change a text
-
-## Credits
-
-Michael Kirkedal Thomsen, DIKU 2017.
