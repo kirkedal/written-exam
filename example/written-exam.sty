@@ -1,0 +1,184 @@
+% Copyright (C) 2017-2018 Michael Kirkedal Thomsen
+%
+% Permission is hereby granted, free of charge, to any person obtaining a copy
+% of this software and associated documentation files (the "Software"), to deal
+% in the Software without restriction, including without limitation the rights
+% to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+% copies of the Software, and to permit persons to whom the Software is
+% furnished to do so, subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be included in
+% all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+% LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Style that can be used to written exams with room for in-line answers
+
+\ProvidesPackage{written-exam}[2017/11/30 v0.2 For setting up question in written exams]
+
+\newcommand\dosolution{false}
+\DeclareOption{solution}{\renewcommand\dosolution{true}}
+\ProcessOptions\relax
+
+\newcommand\ifsolution[1]{\ifthenelse{\equal{\dosolution}{true}}{\textcolor{solutioncolor}{#1}}{}}
+
+\newcommand\ifsolutionelse[2]{\ifthenelse{\equal{\dosolution}{true}}{\textcolor{solutioncolor}{#1}}{#2}}
+
+\newcommand\ifequal[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
+
+\RequirePackage{framed}
+
+\newenvironment{solution}{\ifthenelse{\equal{\dosolution}{true}}{\framed \vspace{-5mm}\subsubsection*{Solution}}{\comment}}{\ifthenelse{\equal{\dosolution}{true}}{\endframed}{\endcomment}}
+
+
+\RequirePackage{calc}
+\RequirePackage{float}
+\RequirePackage{ifthen}
+\RequirePackage{setspace}
+
+\RequirePackage{multido}
+\newcommand{\RepeatCmd}{\multido{\i=1+1}}
+
+\definecolor{rulecolor}{RGB}{127,127,127}
+\definecolor{solutioncolor}{RGB}{0,100,0}
+
+\makeatletter
+\let\old@rule\@rule
+\def\@rule[#1]#2#3{\textcolor{rulecolor}{\old@rule[#1]{#2}{#3}}}
+
+\newcommand*{\currentname}{\@currentlabelname}
+
+\newcommand*{\getlength}[1]{\strip@pt#1}
+\makeatother
+
+\def\restofpage{\dimexpr\pagegoal-\pagetotal-\baselineskip\relax}
+
+%% Definition of question head level
+\newcommand{\questionhead}[2]{\section[#1]{#1~(#2)}}
+\newcommand{\subquestionhead}[2]{\subsection[#1]{#1~(#2)}}
+
+%% Definition of question naming
+\def\thequestion{\textbf{\underline{\currentname, \thesubsection.\arabic{questionNum}:}}}
+
+\newlength{\answerlineheight}
+\setlength{\answerlineheight}{8mm}
+
+\newcommand{\answerline}{\setlength{\parindent}{0em}\par\parbox[b][\answerlineheight]{\textwidth}{\rule{\linewidth}{0.4pt}}}
+
+\newlength{\answerlineheighttotal}
+\setlength{\answerlineheighttotal}{\answerlineheight}
+\addtolength{\answerlineheighttotal}{2pt}
+
+\newcounter{questionNum}
+\makeatletter\@addtoreset{questionNum}{subsection}\makeatother
+\newenvironment{tfquestion}
+    {
+    \renewcommand{\arraystretch}{1.8}
+    \noindent
+    \begin{tabular}{|p{0.8\textwidth}|p{0.06\textwidth}|p{0.06\textwidth}|}
+    \hline
+    {\small \emph{For each statement, answer True or False. (Put one ``\texttt{X}'' in each.)}} & {\centering True} & {\centering False} \\
+    \hline
+    \hline
+    }
+    {
+    \end{tabular}
+    }
+
+\newcommand{\tfitem}[2][0]{%
+  \stepcounter{questionNum}%
+  \alph{questionNum})~%
+  #2
+  & \ifsolution{\ifequal{#1}{true}{\texttt{X}}}
+  & \ifsolution{\ifequal{#1}{false}{\texttt{X}}} \\ \hline}
+
+
+\newcounter{mcnumber}
+\newenvironment{mcquestion}
+  {
+  \setcounter{mcnumber}{0}
+  \vspace{2mm}
+  \stepcounter{questionNum}%
+  \begin{samepage}
+  \par\noindent
+  \thequestion
+  }
+  {
+  \end{samepage}
+  }
+
+\newcommand{\mcitem}[2][]{
+  \stepcounter{mcnumber}
+  \begin{itemize}
+    \item[\scalebox{2}{$\Box\ifsolution{\ifequal{#1}{check}{\!\!\!\!\!\times}}$}] \textbf{\alph{mcnumber})} #2
+  \end{itemize}}
+
+
+\newenvironment{question}{%
+  \begin{samepage}
+  \vspace{2mm}
+  \stepcounter{questionNum}%
+  \par\noindent
+  \thequestion~}
+  {
+  \end{samepage}
+  }
+
+
+\newcommand{\answerlines}[2][~]{%
+ \begin{figure}[H]%
+ \ifsolution{
+  \noindent\hspace{1mm}\parbox[t][#2\answerlineheight][t]{\textwidth}{\setstretch{2}\vspace{.5\answerlineheight}%
+  #1}%
+  \vspace{-#2\answerlineheight}\hspace{-\textwidth}%
+ }
+ \noindent\parbox[t]{\linewidth}{\RepeatCmd{#2}{\answerline}}%
+ \end{figure}
+}
+
+\newcommand{\answerlinesfill}[1][~]{%
+  \def\aln{\getlength{\dimexpr \numexpr \restofpage / (\answerlineheighttotal) \relax pt\relax}}
+  \par~
+    \answerlines[#1]{\aln}\pagebreak
+}
+
+
+\newcommand{\questionfiguretext}{\centering \small (figure space)}
+\newlength{\currentfigureheight}
+
+\newcommand{\answerfigure}[2][~]{%
+  \noindent\ifthenelse{ \equal{#2}{} }{%
+    \setlength{\currentfigureheight}{\restofpage}%
+  }{%
+    \setlength{\currentfigureheight}{#2}%
+  }%
+  \framebox[\textwidth]{\parbox[b][\currentfigureheight]{\textwidth}{
+    \ifsolutionelse{\centering\begin{minipage}{.98\textwidth}#1\end{minipage}\vfill}{\questionfiguretext}%
+  }}%
+}
+
+
+\newcommand{\shortquestion}[1]{\begin{question}#1\answerlines{5}\end{question}}
+
+
+\newenvironment{stdquestion}{%
+    \begin{question}
+  }{
+    \answerlines{10}
+    \end{question}
+  }
+
+\newenvironment{longquestion}{%
+    \begin{question}
+  }{
+    \answerlinesfill
+    \end{question}
+  }

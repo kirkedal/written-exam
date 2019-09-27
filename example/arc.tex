@@ -1,0 +1,240 @@
+% !TEX root = master.tex
+
+\lstdefinelanguage
+   [x64]{Assembler}     % add a "x64" dialect of Assembler
+   [x86masm]{Assembler} % based on the "x86masm" dialect
+   % with these extra keywords:
+   {morekeywords={CDQE,CQO,CMPSQ,CMPXCHG16B,JRCXZ,LODSQ,MOVSXD, %
+                  POPFQ,PUSHFQ,SCASQ,STOSQ,IRETQ,RDTSCP,SWAPGS, %
+                  TESTQ, MOVQ, ADDQ, SUBQ, CMPQ, CMOVQ, LEAQ, CMOVG, MOVL, negq, cmovs, sarq, cmovl, imulq, pushq, popq,%
+                  rax,rdx,rcx,rbx,rsi,rdi,rsp,rbp, %
+                  r8,r8d,r8w,r8b,r9,r9d,r9w,r9b}}
+
+\lstset{language={[x64]Assembler}}
+
+\questionhead{Machine architecture}{80 minutes}
+
+\subquestionhead{True/False Questions}{8 minutes}
+\begin{tfquestion}
+\tfitem[false]{Within Boolean arithmetic then ${\tilde{\;}\,}( A \;\&\; B) = ({\tilde{\;}\,} A)\; \hat{\;} \;({\tilde{\;}\,} B)$.}
+\tfitem[false]{The largest \lstinline{unsigned char} has the value 256.}
+\tfitem[true]{The lowest \lstinline{signed char} has the value -128.}
+% \tfitem{In the IEEE floating point format, a value is denormalised if the exponent is different from 0.}
+\tfitem[false]{Assume \lstinline{x} and \lstinline{y} are signed natural values (e.g. \lstinline{long}), then the C expression \lstinline{(x < y) == ((-x) > (-y))} is always evaluated to true.}
+\tfitem[false]{In the Linux call model, the return address of a procedure call is located in a special purpose register.}
+\end{tfquestion}
+\ifsolution{a) is false, though is looks like DeMorgan's law. Write truth table or consider the size of the domains.}
+
+\noindent
+\ifsolution{d) is false as the arithmetic negation of the smallest (negative) value of a two's complement number does not have positive representative. Thus for this number then \lstinline{x == -x}.}
+
+\noindent
+\ifsolution{e) is false as the return address is located on the stack.}
+
+\subquestionhead{Multiple Choice Questions}{8 minutes}
+\emph{In each of the following questions choose one answer.}
+
+\begin{mcquestion}
+In a pipelined architecture, resolving correctness of a predicted jump is performed in the:
+\mcitem{Fetch phase (\lstinline{F}),}
+\mcitem{decode phase (\lstinline{D}),}
+\mcitem[check]{execute phase (\lstinline{X}), or}
+\mcitem{memory phase (\lstinline{M}).}
+\end{mcquestion}
+
+\begin{mcquestion}
+The 6-bit two's complement number \lstinline{100101} represents the value
+\mcitem{37,}
+\mcitem{27,}
+\mcitem{17,}
+\mcitem{-17,}
+\mcitem[check]{-27, or}
+\mcitem{-37.}
+\end{mcquestion}
+
+% \begin{mcquestion}
+% Consider the following C program for calculating the sum of the entries of a 2-D array.
+% \begin{lstlisting}[language={C}]
+% long arr_sum (long a[M][N]) {
+%   int sum;
+%   for (int i = 0; i < M; i++) {
+%     for (int j = 0; j < N; j++) {
+%       sum += a[i][j];
+%     }
+%   }
+%   return sum;
+% }
+% \end{lstlisting}
+% How would you characterise the behaviour of the program with respect to locality of execution?
+% \mcitem{Only good temporal locality.}
+% \mcitem{Only good spacial locality.}
+% \mcitem[check]{Both good spacial and temporal locality.}
+% \mcitem{Neither good spacial nor temporal locality.}
+% \end{mcquestion}
+
+% Block offset size: log_2(32) = 5 bits
+% Set index size: log_2(16*1024/32/4) = 7 bits
+% Tag size = 64-5-7 = 52
+
+% \begin{mcquestion}
+% Given a byte-addressed machine with 64-bit addresses, that is equipped with a 4-way set-associative data cache of 16 kilobytes and a block size of 32 bytes. How many bits are used for the tag?
+% \mcitem{32 bits}
+% \mcitem{40 bits}
+% \mcitem{46 bits}
+% \mcitem{52 bits}
+% \mcitem{58 bits}
+% \end{mcquestion}
+
+% % Block offset size: log_2(32) = 5 bits
+% % Set index size: log_2(16*1024/32/4) = 7 bits
+% % Tag size = 64-5-7 = 52
+
+
+\newpage
+\subquestionhead{Data Cache}{16 minutes}
+
+Given a byte-addressed machine with 16-bit addresses.
+The machine is equipped with a 4-way set associative data cache of 8 kilobytes.
+Cache have a block size of 16 bytes.
+
+% \textbf{Løsning} \\
+% Da blokken er 16 bytes bruges 4, bit (0-3) til at indexere indenfor blokken
+% Da cachen er 8Kb og blok størrelsen er 16 bytes er der 512 blokke i cachen.
+% Da cachen er 4-vejs associativ er der 128 "sets" i cachen. Der kræves 7 bit
+% for at vælge sæt (bits 4-10).
+% Resten er "tag" (bits 11-15).
+% \textbf{Løsning slut}
+% }
+
+\begin{question}
+For each bit in the table below, indicate which bits of the address would be used for
+\begin{itemize}
+  \item block offset (denote it with \texttt{O}),
+  \item cache tag (denote it with \texttt{T}), and
+  \item set index (denote it with \texttt{S}).
+\end{itemize}
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.8}
+\begin{tabular}{cccccccccccccccc}
+\hline
+ \multicolumn{1}{|p{5mm}|}{\ifsolution{\texttt{T}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{T}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{T}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{T}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{T}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{S}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{O}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{O}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{O}}}
+& \multicolumn{1}{p{5mm}|}{\ifsolution{\texttt{O}}}\\
+\hline
+15&14&13&12&11&10&9&8&7&6&5&4&3&2&1&0\\
+\end{tabular}
+\end{center}
+\end{question}
+
+\begin{question}
+Consider the stream of storage references in hexadecimal format: 
+\begin{quotation}
+  \texttt{0xA010}
+, \texttt{0xF020}
+, \texttt{0xFF20}
+, \texttt{0xFF0C}
+, \texttt{0x0028}
+, \texttt{0xF0A4}
+, \texttt{0xF034}
+.
+\end{quotation}
+
+\noindent Assuming that the cache initially is cold followed by referencing the above stream. Given that the cache uses LRU replacement, what is the effect of a following reference to address: \hspace{5mm}\textbf{\texttt{0x0024}}.
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.8}
+\begin{tabular}{|l|p{5cm}|}
+\hline
+Block Offset: & \texttt{0x}\ifsolution{\texttt{4}}\\
+\hline
+Set Index:    & \texttt{0x}\ifsolution{\texttt{02}}\\
+\hline
+Cache tag:    & \texttt{0x}\ifsolution{\texttt{00}}\\
+\hline
+Cache hit or miss:    & \ifsolution{hit} \\
+\hline
+In case of cache miss, which cache tag is evicted: & \\
+\hline
+\end{tabular}
+\end{center}
+\end{question}
+
+\begin{question}
+Briefly argument for your answer regarding cache hit/miss and address eviction and show the content of the set before and after the reference.
+
+\answerlines[The address is already in the cache as the block containing it was loaded with \texttt{0x0028}. The cache is 4-way and the only other following block loaded into the same set \texttt{0x01} is \texttt{0xF034}.]{8}
+\end{question}
+
+\newpage
+
+
+\subquestionhead{Assembler programming}{30 minutes}
+
+Consider the following program written in X86-assembler.
+
+\begin{lstlisting}[language={[x64]Assembler}, numbers=left]
+program:
+  movq  %rdi, %rax
+  movl  $0, %edx
+  jmp L2
+L3:
+  addq  (%rax), %rdx
+  addq  $8, %rax
+L2:
+  cmpq  %rsi, %rdx
+  jl  L3  
+  subq  %rdi, %rax
+  sarq  $2, %rax
+  ret
+\end{lstlisting}
+
+\begin{question}
+Rewrite the above X86-assembler program to a C program and explain the functionality of the program. The resulting program should not have a goto-style and minor syntactical mistakes are acceptable.
+\answerlinesfill[
+The program take two arguments (\lstinline{\%rdi} and \lstinline{\%rsi}) and calculates twice the number of elements in an unbounded array (*a) that is a required to reach max.\\
+~\\
+\lstinline{long program(long *arr, long max) \{}\\
+\lstinline{\ \ long *arr_ptr = arr; // Located in \%rdi}\\
+\lstinline{\ \ long sum = 0; // Located in \%rdx}\\
+\lstinline{\ \ while (sum < max) \{}\\
+\lstinline{\ \ \ \ sum += *arr_ptr;}\\
+\lstinline{\ \ \ \ arr_ptr++;}\\
+\lstinline{\ \ \}}\\
+\lstinline{\ \ return (arr_ptr - arr) * 2;}\\
+\lstinline{\}}\\
+~\\
+That the return values was twice the size was unintended and due to a copy-paste error; the instruction should have right-shifted by 3. Any answer that does not include this is also accepted and this part should show understanding of pointer arithmetic.
+]
+\end{question}
+
+\begin{question}
+Argument for your choice of statements and expression. Specify which part of the program are not directly translated and argue why.
+\answerlines[We see on the register types that values are \lstinline{long}.
+First argument (\lstinline{\%rdi} which is used in \lstinline{\%rax}) is a pointer to an array; this is seen by the indexing in line 6. The second (\lstinline{\%rsi}) is a number. \lstinline{\%rdx} is overwritten by 0 (in \lstinline{\%edx}) and therefore not an input.\\
+The program structure is a standard while loop as following translation from BOH.
+The comparison of \lstinline{\%rsi} to \lstinline{\%rdx} with the following jump-less-than is the condition of \lstinline{sum} < lstinline{max}.\\
+The array is iterated using pointer arithmetic which is seen in line 7. Line 11 finds the number of elements from the initial array pointer, which in line 12 is divided by 4 using a right-shift. (Note, this was intended to be 8 (shift 3) to account for the length a \lstinline{long}; thus the return value is twice the length.)
+]{12}
+\end{question}
+
+
+\begin{question}
+Briefly describe the semantic difference between logical and arithmetical shifts.
+\answerlines[Right shifts are identical. A logical left shift always adds a 0 as the most significant bit. Arithmetical left shifts duplicated the most significant bit to ensure the sign of a two's complement number.]{5}
+
+\end{question}
+

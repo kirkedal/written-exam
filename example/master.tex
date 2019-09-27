@@ -1,0 +1,53 @@
+\documentclass[a4paper]{article}
+\usepackage{fullpage} % Good use of white space, reduces number of pages -> less stressed students :-)
+\usepackage[fancy]{template} % Setup for headers
+
+% \usepackage[solution]{written-exam}  % Show with solutions
+\usepackage{../written-exam}        % Show without solutions
+
+\usepackage{listings}             % Include the listings-package
+\usepackage{todonotes}            % Good for comments
+% \renewcommand{\todo}[1]{}  % Uncomment to remove todonotes
+
+\usepackage{arydshln}
+\usepackage{xstring} % For string indexing.
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,fit,calc,positioning}
+\usepackage{scalefnt}
+
+\usepackage{nameref}
+\usepackage{remreset}
+
+%% Details about the exam
+\setup{%
+  subject={\textbf{Date:} April 17, 2018},%
+  assignment={4-hour Written Re-Exam in Computer Systems},%
+  date={}%
+}
+\setupLocation[short=DIKU]{
+  Department of Computer Science, University of Copenhagen%
+}
+
+\begin{document}
+\pagenumbering{roman}
+
+\maketitle
+
+\input{formalia}
+
+\pagebreak
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{arc}
+
+\pagebreak
+
+\input{os}
+
+\pagebreak
+
+\input{cn}
+
+\end{document}

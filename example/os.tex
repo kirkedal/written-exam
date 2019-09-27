@@ -1,0 +1,82 @@
+% !TEX root = master.tex
+
+% Questions and answers by Troels Henriksen
+
+\questionhead{Operating Systems}{80 minutes}
+\lstset{language=C}
+
+\subquestionhead{True/False Questions}{8 minutes}
+
+\begin{tfquestion}
+\tfitem[true]{\lstinline{fopen()} is not a system call.}
+\tfitem[false]{There is never more physical memory than virtual memory.}
+\tfitem[false]{System calls are implemented via signals.}
+\tfitem[false]{Virtual memory requires a disk.}
+\tfitem[false]{System calls run in user mode.}
+\tfitem[true]{Condition variables cannot be efficiently implemented solely with mutexes.}
+\end{tfquestion}
+
+\subquestionhead{Multiple Choice Questions}{12 minutes}
+\emph{In each of the following questions, you may put one or more answers.}
+
+\begin{mcquestion}
+Which of the following operations are guaranteed to execute atomically?
+
+\mcitem{\texttt{pthread\_cond\_signal()}}
+\mcitem[check]{\texttt{pthread\_mutex\_lock()}}
+\mcitem{\texttt{x++} (when \texttt{x} is \texttt{int})}
+\mcitem{\texttt{memcpy(\&x, \&y, sizeof(x))}}
+\mcitem[check]{\texttt{pthread\_cond\_wait()}}
+\mcitem{\texttt{exit(0)}}
+\end{mcquestion}
+
+\begin{mcquestion}
+Consider a demand-paged system with the following time-measured utilisations:
+
+  \begin{tabular}{lr}
+    CPU utilisation & 50\% \\
+    Paging disk & 0.7\% \\
+    Other I/O devices & 75\%
+  \end{tabular}
+
+\noindent Which of the following would likely improve CPU utilisation?
+
+\mcitem[check]{Install a faster CPU.}
+\mcitem{Install a bigger paging disk.}
+\mcitem{Install a faster paging disk.}
+\mcitem{Install more main memory.}
+\mcitem[check]{Increase the degree of multiprogramming.}
+\end{mcquestion}
+
+\newpage
+\subquestionhead{Long Questions}{36 minutes}
+
+\begin{question}
+  Which of the following programming techniques and data structures
+  are ``good'' for a demand-paged environment, and which are ``bad''
+  (performance-wise)?  Explain your answers.
+
+  \begin{itemize}
+  \item Stack
+  \item Hash table
+  \item Sequential search of array
+  \item Sequential search of linked list
+  \item Binary search of array
+  \item Vector operations (such as vector addition or computing dot products)
+  \end{itemize}
+
+  \answerlinesfill[A stack is efficient because operations exhibit
+  good \textit{locality}---we are always operating on addresses near
+  each other, which minimises page faults.  A hash table can be
+  inefficient, because a good hash algorithm will ensure that accesses
+  are evenly distributed among buckets.  A sequential search of an
+  array is efficient, because of good locality.  Sequentially
+  searching of a linked list is likely inefficient, because logically
+  neighboring nodes can be arbitrarily distant in memory.  Binary
+  search of an array is likewise also inefficient (from a memory
+  access point of view), again because of large jumps in addresses.
+  Vector operations tend to be efficient, because they involve
+  sequentially traversing arrays.]
+\end{question}
+
+% \answerfigure
