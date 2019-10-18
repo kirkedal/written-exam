@@ -1,0 +1,205 @@
+% Style that can be used to written exams with room for in-line answers
+
+\ProvidesPackage{written-exam}[2017/11/30 v0.2 For setting up question in written exams]
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\HyField@FlagsRadioButton}{\HyField@SetFlag{Ff}{Radio}}{}{}{}
+\makeatother
+\def\DefaultOptionsofRadio{print}
+
+% FORMS
+\RequirePackage{hyperref}
+
+\newlength{\formlineheight}
+\setlength{\formlineheight}{6mm}
+
+% \renewcommand*{\DefaultHeightofTextMultiline}{6\baselineskip} 
+% \renewcommand*{\LayoutTextField}[2]{\makebox[6em][l]{#1: }%
+%   \raisebox{\baselineskip}{\raisebox{-\height}{#2}}}
+% %\renewcommand*{\LayoutTextField}[2]{% or this or similar ...
+%   %\raisebox{-\height}{\makebox[6em][l]{#1: }}\raisebox{-\height}{#2}}
+% \def\LayoutChoiceField#1#2{\makebox[6em][l]{#1: }#2}
+% \newdimen\longline
+% \longline=\textwidth\advance\longline-6em
+
+
+%% For setting up solution
+\newcommand\dosolution{false}
+\DeclareOption{solution}{\renewcommand\dosolution{true}}
+\ProcessOptions\relax
+
+\newcommand\ifsolution[1]{\ifthenelse{\equal{\dosolution}{true}}{\textcolor{solutioncolor}{#1}}{}}
+
+\newcommand\ifsolutionelse[2]{\ifthenelse{\equal{\dosolution}{true}}{\textcolor{solutioncolor}{#1}}{#2}}
+
+
+%% For setting up forms
+\newcommand\doform{false}
+\DeclareOption{form}{\renewcommand\doform{true}}
+\ProcessOptions\relax
+
+\newcommand\ifform[1]{\ifthenelse{\equal{\doform}{true}}{\textcolor{solutioncolor}{#1}}{}}
+
+\newcommand\ifformelse[2]{\ifthenelse{\equal{\doform}{true}}{\textcolor{solutioncolor}{#1}}{#2}}
+
+
+
+\newcommand\ifequal[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
+
+\RequirePackage{framed}
+
+\newenvironment{solution}{\ifthenelse{\equal{\dosolution}{true}}{\framed \vspace{-5mm}\subsubsection*{Solution}}{\comment}}{\ifthenelse{\equal{\dosolution}{true}}{\endframed}{\endcomment}}
+
+
+\RequirePackage{calc}
+\RequirePackage{float}
+\RequirePackage{ifthen}
+\RequirePackage{setspace}
+
+\RequirePackage{multido}
+\newcommand{\RepeatCmd}{\multido{\i=1+1}}
+
+\definecolor{rulecolor}{RGB}{127,127,127}
+\definecolor{solutioncolor}{RGB}{0,100,0}
+
+\makeatletter
+\let\old@rule\@rule
+\def\@rule[#1]#2#3{\textcolor{rulecolor}{\old@rule[#1]{#2}{#3}}}
+
+\newcommand*{\currentname}{\@currentlabelname}
+
+\newcommand*{\getlength}[1]{\strip@pt#1}
+\makeatother
+
+\def\restofpage{\dimexpr\pagegoal-\pagetotal-\baselineskip\relax}
+
+%% Definition of question head level
+\newcommand{\questionhead}[2]{\section[#1]{#1~(#2)}}
+\newcommand{\subquestionhead}[2]{\subsection[#1]{#1~(#2)}}
+
+%% Definition of question naming
+% \def\thequestion{\textbf{\underline{\currentname, \thesubsection.\arabic{questionNum}:}}}
+\def\thequestion{\textbf{\underline{\currentname, \thesection.\arabic{questionNum}:}}}
+
+\def\thequestionNumber{R\thesection.\arabic{questionNum}}
+
+
+\newlength{\answerlineheight}
+\setlength{\answerlineheight}{8mm}
+
+\newcommand{\answerline}{\setlength{\parindent}{0em}\par\parbox[b][\answerlineheight]{\textwidth}{\rule{\linewidth}{0.4pt}}}
+
+\newlength{\answerlineheighttotal}
+\setlength{\answerlineheighttotal}{\answerlineheight}
+\addtolength{\answerlineheighttotal}{2pt}
+
+\newcounter{questionNum}
+\makeatletter\@addtoreset{questionNum}{subsection}\makeatother
+\newenvironment{tfquestion}
+    {
+    \renewcommand{\arraystretch}{1.8}
+    \noindent
+    \begin{tabular}{|p{0.9\textwidth}|p{0.05\textwidth}|p{0.05\textwidth}|}
+    \hline
+    {\small \emph{For each statement, answer True or False. (Put one ``\texttt{X}'' in each.)}} & {\centering True} & {\centering False} \\
+    \hline
+    \hline
+    }
+    {
+    \end{tabular}
+    }
+
+\newcommand{\tfitem}[2][0]{%
+  \stepcounter{questionNum}%
+  \alph{questionNum})~%
+  #2
+  & \ifsolutionelse{\ifequal{#1}{true}{\texttt{X}}}{~\ChoiceMenu[radio,name="{\thequestionNumber}"]{}{t$\!\!\!$}}
+  & \ifsolutionelse{\ifequal{#1}{false}{\texttt{X}}}{\ChoiceMenu[radio,name="{\thequestionNumber}"]{}{f$\!\!$\!}} \\ \hline}
+
+\newcounter{mcnumber}
+\newenvironment{mcquestion}
+  {
+  \setcounter{mcnumber}{0}
+  \vspace{2mm}
+  \stepcounter{questionNum}%
+  \begin{samepage}
+  \par\noindent
+  \thequestion
+  }
+  {
+  \end{samepage}
+  }
+
+\newcommand{\mcitem}[2][]{
+  \stepcounter{mcnumber}
+  \begin{itemize}
+    \item[\scalebox{2}{$\Box\ifsolution{\ifequalelse{#1}{check}{\!\!\!\!\!\times}}{\CheckBox[width=4mm,radio=true,name="{\thequestionNumber.\alph{mcnumber}}"]{}}$}] \textbf{\alph{mcnumber})} #2
+    % \item[\scalebox{2}{$\Box\ifsolution{\ifequal{#1}{check}{\!\!\!\!\!\times}}$}] \textbf{\alph{mcnumber})} #2
+  \end{itemize}}
+
+
+\newenvironment{question}{%
+  \begin{samepage}
+  \vspace{2mm}
+  \stepcounter{questionNum}%
+  \par\noindent
+  \thequestion~}
+  {
+  \end{samepage}
+  }
+
+
+\newcommand{\answerlines}[2][~]{%
+ \begin{figure}[H]%
+ \ifsolutionelse{
+  \noindent\hspace{1mm}\parbox[t][#2\answerlineheight][t]{\textwidth}{\setstretch{1.5}\vspace{.5\answerlineheight}%
+  #1}%
+  \vspace{-#2\answerlineheight}\hspace{-\textwidth}%
+  \noindent\parbox[t]{\linewidth}{\RepeatCmd{#2}{\answerline}}%
+ }{
+ % \noindent\parbox[t]{\linewidth}{\RepeatCmd{#2}{\answerline}}%
+  %% NEW
+ \noindent\TextField[name=\thequestionNumber,multiline=true,height=#2\formlineheight,
+  width=\textwidth,charsize=14pt,borderwidth=3,backgroundcolor={.95 .95 .95}]{}\\%
+  {\centering\small\emph{(Maximum #2 lines.)}}
+ }
+ \end{figure}
+}
+
+\newcommand{\answerlinesfill}[1][~]{%
+  \def\aln{\getlength{\dimexpr \numexpr \restofpage / (\answerlineheighttotal) \relax pt\relax}}
+  \par~
+    \answerlines[#1]{\aln}\pagebreak
+}
+
+
+\newcommand{\questionfiguretext}{\centering \small (figure space)}
+\newlength{\currentfigureheight}
+
+\newcommand{\answerfigure}[2][~]{%
+  \noindent\ifthenelse{ \equal{#2}{} }{%
+    \setlength{\currentfigureheight}{\restofpage}%
+  }{%
+    \setlength{\currentfigureheight}{#2}%
+  }%
+  \framebox[\textwidth]{\parbox[b][\currentfigureheight]{\textwidth}{\questionfiguretext}}%
+}
+
+
+\newcommand{\shortquestion}[1]{\begin{question}#1\answerlines{5}\end{question}}
+
+
+\newenvironment{stdquestion}{%
+    \begin{question}
+  }{
+    \answerlines{10}
+    \end{question}
+  }
+
+\newenvironment{longquestion}{%
+    \begin{question}
+  }{
+    \answerlinesfill
+    \end{question}
+  }
